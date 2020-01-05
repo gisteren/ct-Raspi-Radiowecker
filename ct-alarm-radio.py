@@ -12,6 +12,9 @@ from datetime import datetime
 import time
 import threading
 
+import pydevd_pycharmx
+
+
 
 class application:
 
@@ -504,4 +507,5 @@ class application:
 
 
 if __name__ == "__main__":
+    pydevd_pycharm.settrace('weewxwetterwolke', port=6610, stdoutToServer=True, stderrToServer=True)
     app = application()
