@@ -74,23 +74,27 @@ class MusicPlayer(object):
         try:
             trackinfo = self._clientRequest(
                 "core.playback.get_current_track")["result"]
-            trackimages = self._clientRequest("core.library.get_images", {
-                "uris": [trackinfo["uri"]]})["result"]
-            if self.old_trackinfo == trackinfo and self.old_trackimages == trackimages:
+            if self.old_trackinfo == trackinfo:
                 self.trackdata_changed = False
                 return
             else:
+                self.trackdata_changed = True
+
+            if trackinfo is None:
+                self.imageurl = self.old_trackinfo = self.old_trackimages = None
+                self.artist = self.album = self.title = ""
+            else:
+                trackimages = self._clientRequest("core.library.get_images", {
+                    "uris": [trackinfo["uri"]]})["result"]
                 self.old_trackinfo = trackinfo
                 self.old_trackimages = trackimages
-                self.trackdata_changed = True
-            self.artist = trackinfo["artists"][0]["name"].strip()
-
-            self.album = trackinfo["album"]["name"].strip()
-            self.title = trackinfo["name"].strip()
-            try:
-                self.imageurl = trackimages[trackinfo["uri"]][0]["uri"]
-            except:
-                self.imageurl = None
+                self.artist = trackinfo["artists"][0]["name"].strip()
+                self.album = trackinfo["album"]["name"].strip()
+                self.title = trackinfo["name"].strip()
+                try:
+                    self.imageurl = trackimages[trackinfo["uri"]][0]["uri"]
+                except:
+                    self.imageurl = None
         except Exception as e:
             print(traceback.format_exc())
             self.artist = self.album = self.title = ""
