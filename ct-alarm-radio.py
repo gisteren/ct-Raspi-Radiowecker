@@ -12,7 +12,7 @@ from datetime import datetime
 import time
 import threading
 
-import pydevd_pycharmx
+import pydevd_pycharm
 
 
 
