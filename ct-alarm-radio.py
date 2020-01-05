@@ -507,5 +507,5 @@ class application:
 
 
 if __name__ == "__main__":
-    pydevd_pycharm.settrace('weewxwetterwolke', port=6610, stdoutToServer=True, stderrToServer=True)
+    pydevd_pycharm.settrace('BigBook', port=6610, stdoutToServer=True, stderrToServer=True)
     app = application()
