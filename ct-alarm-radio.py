@@ -488,13 +488,6 @@ class application:
         self.current_screen = self.clockscreen
         self.ui.redraw = True
 
-    def alarm_triggered(self):
-        self.current_screen == self.alarmscreen
-        self.ui.redraw = True
-        self.musicplayer.setAlarmPlaylist()
-        if not self.musicplayer.playing:
-            self.musicplayer.play()
-
     # the main loop
     def loop(self):
         while True:
