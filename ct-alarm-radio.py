@@ -319,7 +319,7 @@ class application:
             self.current_screen = self.alarmscreen
             return
 
-        if self.is_idle and self.current_screen == self.clockscreen():
+        if self.is_idle and self.current_screen != self.musicscreen and self.current_screen != self.alarmscreen:
             self.ui.redraw = True
             self.current_screen = self.idlescreen
             return
