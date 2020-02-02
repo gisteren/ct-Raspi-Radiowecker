@@ -500,5 +500,6 @@ class application:
 
 
 if __name__ == "__main__":
+    time.sleep(20)
     pydevd_pycharm.settrace('BigBook', port=6610, stdoutToServer=True, stderrToServer=True)
     app = application()
