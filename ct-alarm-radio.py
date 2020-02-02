@@ -161,7 +161,7 @@ class application:
         if not hasattr(self, 'alarmscreen_cache'):
             self.cache_alarmscreen()
 
-        if not self.musicplayer.playing and not self.player_primed:
+        if not self.player_primed:
             self.player_primed = True
             self.musicplayer.setAlarmPlaylist()
             self.musicplayer.play()
