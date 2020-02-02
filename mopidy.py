@@ -157,10 +157,9 @@ class MusicPlayer(object):
 
     def setAlarmPlaylist(self):
         try:
-            self.checkAlarmPlaylist()
+            self.ensureAlarmPlaylist()
             self._clientRequest("core.tracklist.clear")
-            alarm_uri = self._clientRequest("core.playlists.filter", {
-                "criteria": {"name": "Alarm"}})["result"][0]["uri"]
+            alarm_uri = self.lookupAlarmPlaylist()
             alarm_tracks = self._clientRequest(
                 "core.playlists.get_items", {"uri": alarm_uri})["result"]
             for track in alarm_tracks:
@@ -169,15 +168,20 @@ class MusicPlayer(object):
         except Exception as e:
             print(e)
 
-    def checkAlarmPlaylist(self):
-        response = self._clientRequest("core.playlists.as_list")
-        filteredResult = [playlist for playlist in response["result"] if playlist.name == "Alarm"]
-        if len(filteredResult) > 0:
-            self.playlist = filteredResult[0]["uri"]
-        else:
-            self.playlist = self._clientRequest("core.playlists.create", {
+    def ensureAlarmPlaylist(self):
+        alarm_playlist = self.lookupAlarmPlaylist()
+        if alarm_playlist is None:
+            self._clientRequest("core.playlists.create", {
                 "name": "Alarm"
-            })["result"][0]["uri"]
+            })
+
+    def lookupAlarmPlaylist(self):
+        response = self._clientRequest("core.playlists.as_list")
+        filtered_result = [playlist for playlist in response["result"] if playlist["name"] == "Alarm"]
+        if len(filtered_result) > 0:
+            return filtered_result[0]["uri"]
+        else:
+            return None
 
     def _clientRequest(self, method, params={}):
         headers = {'content-type': 'application/json'}
