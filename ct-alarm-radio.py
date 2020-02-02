@@ -12,7 +12,7 @@ from datetime import datetime
 import time
 import threading
 
-#import pydevd_pycharm
+import pydevd_pycharm
 
 
 
@@ -500,6 +500,6 @@ class application:
 
 
 if __name__ == "__main__":
-#    time.sleep(20)
-#    pydevd_pycharm.settrace('BigBook', port=6610, stdoutToServer=True, stderrToServer=True)
+    time.sleep(20)
+    pydevd_pycharm.settrace('BigBook', port=6610, stdoutToServer=True, stderrToServer=True)
     app = application()
