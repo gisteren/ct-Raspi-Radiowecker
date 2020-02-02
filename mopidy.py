@@ -162,9 +162,9 @@ class MusicPlayer(object):
             alarm_uri = self.lookupAlarmPlaylist()
             alarm_tracks = self._clientRequest(
                 "core.playlists.get_items", {"uri": alarm_uri})["result"]
-            for track in alarm_tracks:
-                self._clientRequest(
-                    "core.tracklist.add", {'uri': track["uri"]})
+            track_uris = [track["uri"] for track in alarm_tracks]
+            self._clientRequest(
+                "core.tracklist.add", {'uris': track_uris})
         except Exception as e:
             print(e)
 
