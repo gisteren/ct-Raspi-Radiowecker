@@ -170,10 +170,10 @@ class MusicPlayer(object):
             print(e)
 
     def checkAlarmPlaylist(self):
-        result = self._clientRequest("core.playlists.filter", {
-            "criteria": {"name": "Alarm"}})
-        if len(result["result"]) > 0:
-            self.playlist = result["result"][0]["uri"]
+        response = self._clientRequest("core.playlists.as_list")
+        filteredResult = [playlist for playlist in response["result"] if playlist.name == "Alarm"]
+        if len(filteredResult) > 0:
+            self.playlist = filteredResult[0]["uri"]
         else:
             self.playlist = self._clientRequest("core.playlists.create", {
                 "name": "Alarm"
