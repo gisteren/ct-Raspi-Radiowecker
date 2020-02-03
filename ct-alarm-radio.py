@@ -319,11 +319,6 @@ class application:
             self.current_screen = self.alarmscreen
             return
 
-        if self.is_idle and self.current_screen == self.clockscreen:
-            self.ui.redraw = True
-            self.current_screen = self.idlescreen
-            return
-
         if self.current_screen != self.alarmset_screen or reset:
             if self.alarm.alarm_active:
                 self.ui.redraw = True
@@ -331,6 +326,9 @@ class application:
             elif self.musicplayer.playing:
                 self.ui.redraw = True
                 self.current_screen = self.musicscreen
+            elif self.is_idle:
+                self.ui.redraw = True
+                self.current_screen = self.idlescreen
             else:
                 self.ui.redraw = True
                 self.current_screen = self.clockscreen
