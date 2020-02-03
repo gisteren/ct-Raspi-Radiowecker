@@ -314,23 +314,22 @@ class application:
             self.ui.elements.append(self.player_widget_cache[volume_icon])
 
     def switch_to_defaultscreen(self, reset=False):
-        if self.alarm.alarm_active:
+        if self.alarm.alarm_active or self.current_screen == self.alarmset_screen:
             self.is_idle = False
+
+        if self.alarm.alarm_active:
             self.current_screen = self.alarmscreen
             return
 
         if self.current_screen != self.alarmset_screen or reset:
+            self.ui.redraw = True
             if self.alarm.alarm_active:
-                self.ui.redraw = True
                 self.current_screen = self.alarmscreen
             elif self.musicplayer.playing:
-                self.ui.redraw = True
                 self.current_screen = self.musicscreen
             elif self.is_idle:
-                self.ui.redraw = True
                 self.current_screen = self.idlescreen
             else:
-                self.ui.redraw = True
                 self.current_screen = self.clockscreen
 
     def cache_datewidget(self):
