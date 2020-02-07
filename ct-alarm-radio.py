@@ -478,6 +478,7 @@ class application:
         self.alarm.setAlarm()
         self.config.setting["alarmtime"] = self.alarm.alarmtime.strftime(
             "%H:%M")
+        self.config.setting["enable_alarm"] = 1
         self.config.save()
         self.switch_to_defaultscreen(True)
 
@@ -492,7 +493,9 @@ class application:
         self.ui.redraw = True
 
     def switch_alarm_off(self):
-        self.alarm.resetAlarm()
+        self.alarm.enabled = False
+        self.config.setting["enable_alarm"] = 0
+        self.config.save()
         self.switch_to_defaultscreen(True)
 
     # the main loop
