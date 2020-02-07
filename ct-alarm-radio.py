@@ -472,6 +472,7 @@ class application:
 
         self.ui.elements.append(self.alarmset_screen_cache["ok_button"])
         self.ui.elements.append(self.alarmset_screen_cache["cancel_button"])
+        self.ui.elements.append(self.alarmset_screen_cache["off_button"])
 
     def set_alarm(self):
         self.alarm.setAlarm()
