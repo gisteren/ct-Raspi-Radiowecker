@@ -415,7 +415,7 @@ class application:
         self.alarmset_screen_cache["alarmtime"] = gui.Text(
             alarmtime_text, alarmtime_size, self.ui.boldfont_file, shadowoffset=(0.5, 0.5))
         self.alarmset_screen_cache["alarmtime"].Position = self.ui.calculate_position(
-            (0, -24), self.alarmset_screen_cache["alarmtime"].Surface, "center", "right")
+            (0, -34), self.alarmset_screen_cache["alarmtime"].Surface, "center", "right")
 
         icon_size = (
             self.ui.display_size[0] * .25, self.ui.display_size[1] * .25)
