@@ -499,8 +499,7 @@ class application:
         while True:
             self.ui.elements.clear()
             self.switch_to_defaultscreen()
-            if self.current_screen != None:
-                self.current_screen()
+            self.current_screen()
 
             self.ui.update()
 
