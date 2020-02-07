@@ -415,7 +415,7 @@ class application:
         self.alarmset_screen_cache["alarmtime"] = gui.Text(
             alarmtime_text, alarmtime_size, self.ui.boldfont_file, shadowoffset=(0.5, 0.5))
         self.alarmset_screen_cache["alarmtime"].Position = self.ui.calculate_position(
-            (0, -14), self.alarmset_screen_cache["alarmtime"].Surface, "center", "right")
+            (0, -24), self.alarmset_screen_cache["alarmtime"].Surface, "center", "right")
 
         icon_size = (
             self.ui.display_size[0] * .25, self.ui.display_size[1] * .25)
@@ -426,32 +426,37 @@ class application:
         self.alarmset_screen_cache["addminute_button"] = gui.Button(
             self.ui.image_cache["add.png"], icon_size, lambda: changeAlarmTime(1), lambda: changeAlarmTime(5))
         self.alarmset_screen_cache["addminute_button"].Position = self.ui.calculate_position(
-            (-15, -20), self.alarmset_screen_cache["addminute_button"].Surface, "center", "right")
+            (-15, -30), self.alarmset_screen_cache["addminute_button"].Surface, "center", "right")
 
         self.alarmset_screen_cache["subminute_button"] = gui.Button(
             self.ui.image_cache["sub.png"], icon_size, lambda: changeAlarmTime(-1), lambda: changeAlarmTime(-5))
         self.alarmset_screen_cache["subminute_button"].Position = self.ui.calculate_position(
-            (15, -20), self.alarmset_screen_cache["subminute_button"].Surface, "center", "right")
+            (15, -30), self.alarmset_screen_cache["subminute_button"].Surface, "center", "right")
 
         self.alarmset_screen_cache["addhour_button"] = gui.Button(
             self.ui.image_cache["add.png"], icon_size, lambda: changeAlarmTime(60))
         self.alarmset_screen_cache["addhour_button"].Position = self.ui.calculate_position(
-            (-15, -65), self.alarmset_screen_cache["addhour_button"].Surface, "center", "right")
+            (-15, -75), self.alarmset_screen_cache["addhour_button"].Surface, "center", "right")
 
         self.alarmset_screen_cache["subhour_button"] = gui.Button(
             self.ui.image_cache["sub.png"], icon_size, lambda: changeAlarmTime(-60))
         self.alarmset_screen_cache["subhour_button"].Position = self.ui.calculate_position(
-            (15, -65), self.alarmset_screen_cache["subhour_button"].Surface, "center", "right")
+            (15, -75), self.alarmset_screen_cache["subhour_button"].Surface, "center", "right")
 
         self.alarmset_screen_cache["cancel_button"] = gui.Button(
             self.ui.image_cache["cancel.png"], big_icon_size, self.reset_alarm)
         self.alarmset_screen_cache["cancel_button"].Position = self.ui.calculate_position(
-            (-15, 25), self.alarmset_screen_cache["cancel_button"].Surface, "center", "left")
+            (-15, 15), self.alarmset_screen_cache["cancel_button"].Surface, "center", "left")
 
         self.alarmset_screen_cache["ok_button"] = gui.Button(
             self.ui.image_cache["ok.png"], big_icon_size, self.set_alarm)
         self.alarmset_screen_cache["ok_button"].Position = self.ui.calculate_position(
-            (15, 25), self.alarmset_screen_cache["ok_button"].Surface, "center", "left")
+            (15, 15), self.alarmset_screen_cache["ok_button"].Surface, "center", "left")
+        
+        self.alarmset_screen_cache["off_button"] = gui.Button(
+            self.ui.image_cache["off.png"], big_icon_size, self.switch_alarm_off)
+        self.alarmset_screen_cache["off_button"].Position = self.ui.calculate_position(
+            (15, -5), self.alarmset_screen_cache["ok_button"].Surface, "center", "right")
 
     def alarmset_screen(self):
         if not hasattr(self, 'alarmset_screen_cache'):
@@ -484,6 +489,10 @@ class application:
         self.player_primed = False
         self.current_screen = self.clockscreen
         self.ui.redraw = True
+        
+    def switch_alarm_off(self):
+        self.alarm.resetAlarm()
+        self.switch_to_defaultscreen(True)
 
     # the main loop
     def loop(self):
