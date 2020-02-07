@@ -1,19 +1,18 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import pygame
-import gui
 import locale
-from config import config
-from mopidy import MusicPlayer
-from alarm import Alarm
-from subprocess import call
-from datetime import datetime
-import time
 import threading
+import time
+from datetime import datetime
 
 import pydevd_pycharm
+import pygame
 
+import gui
+from alarm import Alarm
+from config import config
+from mopidy import MusicPlayer
 
 
 class application:
@@ -25,13 +24,14 @@ class application:
             self.config.setting["resolution"],
             self.config.setting["fg_color"],
             self.config.setting["bg_color"],
-            self.config.setting["show_mouse_cursor"],
-            quit_function=self.cleanup
+            self.config.setting["show_mouse_cursor"]
         )
-        locale.setlocale(locale.LC_ALL, self.config.setting["locale"]+".utf8")
+        locale.setlocale(locale.LC_ALL, self.config.setting["locale"] + ".utf8")
 
         self.musicplayer = MusicPlayer(self.config.setting["mopidy_host"])
-        self.alarm = Alarm(self.config.setting["alarmtime"])
+        self.alarm = Alarm(
+            self.config.setting["alarmtime"],
+            self.config.setting["enable_alarm"])
         self.alarm.alarm_active = False
         self.player_primed = False
 
@@ -53,9 +53,6 @@ class application:
                 self.time_last_idle = time.time()
                 self.is_idle = True
             time.sleep(1)
-
-    def cleanup(self):
-        print("bye")
 
     def cache_idlescreen(self):
         self.idlescreen_cache = {}
@@ -155,7 +152,7 @@ class application:
         self.alarmscreen_cache["time_text_button"].Position = self.ui.calculate_position(
             (0, -30), self.alarmscreen_cache["alarm_button"].Surface, "center", "center")
         self.alarmscreen_cache["time_text_button"].Position = (
-            self.alarmscreen_cache["alarm_button"].Position[0] + icon_size[1]*1.2, self.alarmscreen_cache["alarm_button"].Position[1])
+            self.alarmscreen_cache["alarm_button"].Position[0] + icon_size[1] * 1.2, self.alarmscreen_cache["alarm_button"].Position[1])
 
     def alarmscreen(self):
         if not hasattr(self, 'alarmscreen_cache'):
@@ -200,21 +197,22 @@ class application:
             (0, 0), self.musicscreen_cache["track_text"].Surface, "center", "left")
 
         self.musicscreen_cache["track_text"].Position = (self.musicscreen_cache["albumart_image"].Position[0] +
-                                                         self.musicscreen_cache["albumart_image"].Surface.get_size()[0]*1.05, self.musicscreen_cache["track_text"].Position[1])
+                                                         self.musicscreen_cache["albumart_image"].Surface.get_size()[0] * 1.05,
+                                                         self.musicscreen_cache["track_text"].Position[1])
 
         artistfont_size = self.ui.calculate_font_size(3)
         self.musicscreen_cache["artist_text"] = gui.Text(
             self.musicplayer.artist, artistfont_size, font=self.ui.basefont_file)
 
         artist_text_y = self.musicscreen_cache["track_text"].Position[1] - (
-            self.ui.display_size[1] * 0.08)
+                self.ui.display_size[1] * 0.08)
         self.musicscreen_cache["artist_text"].Position = (
             self.musicscreen_cache["track_text"].Position[0], artist_text_y)
 
         self.musicscreen_cache["album_text"] = gui.Text(self.musicplayer.album,
                                                         artistfont_size, font=self.ui.basefont_file)
         album_text_y = (
-            (self.ui.display_size[1] * 0.03) + self.musicscreen_cache["track_text"].Rect.bottom)
+                (self.ui.display_size[1] * 0.03) + self.musicscreen_cache["track_text"].Rect.bottom)
         self.musicscreen_cache["album_text"].Position = (
             self.musicscreen_cache["track_text"].Position[0], album_text_y)
 
@@ -275,7 +273,8 @@ class application:
         self.player_widget_cache["volhigh"] = gui.Button(
             self.ui.image_cache["volhigh.png"], icon_size, self.musicplayer.toggleMute)
 
-        self.player_widget_cache["volmute"].Position = self.player_widget_cache["volhigh"].Position = self.player_widget_cache["volmed"].Position = self.player_widget_cache["vollow"].Position = (
+        self.player_widget_cache["volmute"].Position = self.player_widget_cache["volhigh"].Position = self.player_widget_cache["volmed"].Position = \
+        self.player_widget_cache["vollow"].Position = (
             self.player_widget_cache["volup_button"].Position[0] - icon_size[1], self.player_widget_cache["volup_button"].Position[1])
 
         self.player_widget_cache["voldown_button"] = gui.Button(
@@ -375,7 +374,7 @@ class application:
         if not updatetime:
             self.alarm_widget_cache = {}
             self.alarm_widget_cache["alarm_image_button"] = gui.Button(self.ui.image_cache[
-                "alarm-symbolic.png"], icon_size, self.switch_to_alarmset_screen)
+                                                                           "alarm-symbolic.png"], icon_size, self.switch_to_alarmset_screen)
             self.alarm_widget_cache["alarm_image_button"].Position = self.ui.calculate_position(
                 (1, 4), self.alarm_widget_cache["alarm_image_button"].Surface, "top", "left")
 
@@ -387,7 +386,8 @@ class application:
         self.alarm_widget_cache["alarm_text_button"] = gui.Button(
             alarm_text.Surface, alarm_text.Surface.get_size(), self.switch_to_alarmset_screen)
         self.alarm_widget_cache["alarm_text_button"].Position = (
-            self.alarm_widget_cache["alarm_image_button"].Position[0] + (icon_size[1]*1.1), self.alarm_widget_cache["alarm_image_button"].Position[1]*1.2)
+            self.alarm_widget_cache["alarm_image_button"].Position[0] + (icon_size[1] * 1.1),
+            self.alarm_widget_cache["alarm_image_button"].Position[1] * 1.2)
 
     def alarm_widget(self):
         if not hasattr(self, 'alarm_widget_cache'):
@@ -452,7 +452,7 @@ class application:
             self.ui.image_cache["ok.png"], big_icon_size, self.set_alarm)
         self.alarmset_screen_cache["ok_button"].Position = self.ui.calculate_position(
             (15, 8), self.alarmset_screen_cache["ok_button"].Surface, "center", "left")
-        
+
         self.alarmset_screen_cache["off_button"] = gui.Button(
             self.ui.image_cache["off.png"], big_icon_size, self.switch_alarm_off)
         self.alarmset_screen_cache["off_button"].Position = self.ui.calculate_position(
@@ -490,7 +490,7 @@ class application:
         self.player_primed = False
         self.current_screen = self.clockscreen
         self.ui.redraw = True
-        
+
     def switch_alarm_off(self):
         self.alarm.resetAlarm()
         self.switch_to_defaultscreen(True)

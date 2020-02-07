@@ -8,9 +8,10 @@ class Alarm(object):
     alarm_active = False
     old_time = 0
 
-    def __init__(self, alarmtime):
+    def __init__(self, alarmtime, enable_alarm):
         self.alarmtime = datetime.strptime(alarmtime, "%H:%M")
         self.time = self.alarmtime
+        self.enabled = enable_alarm == "1"
         self.check_alarm_thread = threading.Thread(target=self.check_alarm)
         self.check_alarm_thread.daemon = True
         self.check_alarm_thread.start()
@@ -20,7 +21,7 @@ class Alarm(object):
             new_time = int(datetime.now().minute)
             if new_time != self.old_time:
                 self.old_time = new_time
-                if self.alarmtime.hour == datetime.now().hour and self.alarmtime.minute == datetime.now().minute:
+                if self.enabled and self.alarmtime.hour == datetime.now().hour and self.alarmtime.minute == datetime.now().minute:
                     self.alarm_active = True
             time.sleep(1)
 
