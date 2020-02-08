@@ -371,9 +371,9 @@ class application:
     def cache_alarm_widget(self, updatetime=False):
         icon_size = (
             self.ui.display_size[0] * .05, self.ui.display_size[1] * .05)
-        
-        alarm_symbol_name =  "alarm-symbolic.png" if self.alarm.enabled else "alarm-off-symbolic.png" 
+
         if not updatetime:
+            alarm_symbol_name = "alarm-symbolic.png" if self.alarm.enabled else "alarm-off-symbolic.png"
             self.alarm_widget_cache = {}
             self.alarm_widget_cache["alarm_image_button"] = gui.Button(self.ui.image_cache[
                                                                            alarm_symbol_name], icon_size, self.switch_to_alarmset_screen)
@@ -492,6 +492,7 @@ class application:
         self.config.setting["alarmtime"] = self.alarm.alarmtime.strftime("%H:%M")
         self.config.setting["enable_alarm"] = "1" if self.alarm.enabled else "0"
         self.config.save()
+        self.cache_alarm_widget()
 
     def reset_alarm(self):
         self.alarm.resetAlarm()
