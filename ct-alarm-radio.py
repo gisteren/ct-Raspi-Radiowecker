@@ -479,14 +479,16 @@ class application:
     def set_alarm(self):
         self.alarm.setAlarm()
         self.alarm.enabled = True
+        self.save_alarm()
         self.switch_to_defaultscreen(True)
 
     def switch_alarm_off(self):
         self.alarm.setAlarm()
         self.alarm.enabled = False
+        self.save_alarm()
         self.switch_to_defaultscreen(True)
         
-    def set_alarm(self):
+    def save_alarm(self):
         self.config.setting["alarmtime"] = self.alarm.alarmtime.strftime("%H:%M")
         self.config.setting["enable_alarm"] = "1" if self.alarm.enabled else "0"
         self.config.save()
