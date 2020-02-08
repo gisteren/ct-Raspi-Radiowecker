@@ -456,7 +456,7 @@ class application:
             (15, 8), self.alarmset_screen_cache["ok_button"].Surface, "center", "left")
 
         self.alarmset_screen_cache["off_button"] = gui.Button(
-            self.ui.image_cache["off.png"], big_icon_size, self.switch_alarm_off)
+            self.ui.image_cache["off.png"], icon_size, self.switch_alarm_off)
         self.alarmset_screen_cache["off_button"].Position = self.ui.calculate_position(
             (15, -5), self.alarmset_screen_cache["off_button"].Surface, "center", "right")
 
