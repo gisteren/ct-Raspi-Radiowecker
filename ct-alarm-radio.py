@@ -160,7 +160,7 @@ class application:
 
         if not self.player_primed:
             self.player_primed = True
-            self.musicplayer.setAlarmPlaylist()
+            self.musicplayer.set_alarm_playlist()
             self.musicplayer.play()
 
         new_time = int(time.time())
@@ -265,13 +265,13 @@ class application:
             (0, 32), self.player_widget_cache["play_button"].Surface, "bottom", "left")
 
         self.player_widget_cache["volmute"] = gui.Button(
-            self.ui.image_cache["volmute.png"], icon_size, self.musicplayer.toggleMute)
+            self.ui.image_cache["volmute.png"], icon_size, self.musicplayer.toggle_mute)
         self.player_widget_cache["vollow"] = gui.Button(
-            self.ui.image_cache["vollow.png"], icon_size, self.musicplayer.toggleMute)
+            self.ui.image_cache["vollow.png"], icon_size, self.musicplayer.toggle_mute)
         self.player_widget_cache["volmed"] = gui.Button(
-            self.ui.image_cache["volmed.png"], icon_size, self.musicplayer.toggleMute)
+            self.ui.image_cache["volmed.png"], icon_size, self.musicplayer.toggle_mute)
         self.player_widget_cache["volhigh"] = gui.Button(
-            self.ui.image_cache["volhigh.png"], icon_size, self.musicplayer.toggleMute)
+            self.ui.image_cache["volhigh.png"], icon_size, self.musicplayer.toggle_mute)
 
         self.player_widget_cache["volmute"].Position = self.player_widget_cache["volhigh"].Position = self.player_widget_cache["volmed"].Position = \
         self.player_widget_cache["vollow"].Position = (

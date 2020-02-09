@@ -104,7 +104,7 @@ class MusicPlayer(object):
             self.album = ""
 
     def toggle_play(self):
-        tracklist = self.get_current_track_list()
+        self.ensure_tracklist()
         if self.playing:
             method = "core.playback.pause"
         else:
@@ -134,7 +134,7 @@ class MusicPlayer(object):
             self.volume = 100
             self.muted = False
 
-    def toggleMute(self):
+    def toggle_mute(self):
         self._clientRequest("core.mixer.set_mute", {"mute": not self.muted})
         self.muted = bool(self._clientRequest(
             "core.mixer.get_mute")["result"])
@@ -156,11 +156,17 @@ class MusicPlayer(object):
         else:
             self.playing = False
 
-    def get_current_track_list(self):
-        result = self._clientRequest("core.tracklist.get_tracks")
-        return result
+    def get_current_tracklist(self):
+        return self._clientRequest("core.tracklist.get_tracks")["result"]
 
-    def setAlarmPlaylist(self):
+    def is_current_tracklist_empty(self):
+        return len(self.get_current_tracklist()) == 0
+    
+    def ensure_tracklist(self):
+        if self.is_current_tracklist_empty():
+            self.set_alarm_playlist()
+    
+    def set_alarm_playlist(self):
         try:
             self.ensure_alarm_playlist()
             self._clientRequest("core.tracklist.clear")
