@@ -174,7 +174,8 @@ class MusicPlayer(object):
             self.ensure_playlist()
             self._clientRequest("core.tracklist.clear")
             track_uris = self.load_playlist_tracks()
-            self._clientRequest("core.tracklist.add", {'uris': track_uris})
+            response = self._clientRequest("core.tracklist.add", {'uris': track_uris})
+            print(len(response["result"] + " songs added"))
         except Exception as e:
             print(e)
 
