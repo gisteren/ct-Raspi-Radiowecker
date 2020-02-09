@@ -243,9 +243,9 @@ class application:
             0, 0, 0, 0), pygame.Color(0, 0, 0, 255), vertical=True)
 
         self.player_widget_cache["play_button"] = gui.Button(
-            self.ui.image_cache["play.png"], icon_size, self.musicplayer.togglePlay)
+            self.ui.image_cache["play.png"], icon_size, self.musicplayer.toggle_play)
         self.player_widget_cache["pause_button"] = gui.Button(
-            self.ui.image_cache["pause.png"], icon_size, self.musicplayer.togglePlay)
+            self.ui.image_cache["pause.png"], icon_size, self.musicplayer.toggle_play)
         self.player_widget_cache["play_button"].Position = self.player_widget_cache["pause_button"].Position = self.ui.calculate_position(
             (0, -18), self.player_widget_cache["play_button"].Surface, "bottom", "right")
 
@@ -286,10 +286,7 @@ class application:
         if not hasattr(self, 'player_widget_cache'):
             self.cache_player_widget()
 
-        if self.musicplayer.playing:
-            icon = "pause_button"
-        else:
-            icon = "play_button"
+        icon = "pause_button" if self.musicplayer.playing else "play_button"
 
         self.ui.elements.append(self.player_widget_cache["panel"])
         self.ui.elements.append(self.player_widget_cache[icon])

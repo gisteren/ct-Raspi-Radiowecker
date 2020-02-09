@@ -42,7 +42,7 @@ class MusicPlayer(object):
     def updateStatus(self):
         while True:
             self.updateTrackInfo()
-            self.getState()
+            self.get_state()
             self.getVolume()
             time.sleep(1)
 
@@ -103,18 +103,19 @@ class MusicPlayer(object):
         if self.artist == self.album:
             self.album = ""
 
-    def togglePlay(self):
+    def toggle_play(self):
+        tracklist = self.get_current_track_list()
         if self.playing:
             method = "core.playback.pause"
         else:
             method = "core.playback.play"
         self._clientRequest(method)
-        self.getState()
+        self.get_state()
 
     def play(self):
         method = "core.playback.play"
         self._clientRequest(method)
-        self.getState()
+        self.get_state()
 
     def skip(self):
         self._clientRequest("core.playback.next")
@@ -148,16 +149,20 @@ class MusicPlayer(object):
                             "volume": self.volume - 10})
         self.getVolume()
 
-    def getState(self):
+    def get_state(self):
         status = self._clientRequest("core.playback.get_state")["result"]
         if status == "playing":
             self.playing = True
         else:
             self.playing = False
 
+    def get_current_track_list(self):
+        result = self._clientRequest("core.tracklist.get_tracks")
+        return result
+
     def setAlarmPlaylist(self):
         try:
-            self.ensureAlarmPlaylist()
+            self.ensure_alarm_playlist()
             self._clientRequest("core.tracklist.clear")
             alarm_uri = self.lookupAlarmPlaylist()
             alarm_tracks = self._clientRequest(
@@ -168,7 +173,7 @@ class MusicPlayer(object):
         except Exception as e:
             print(e)
 
-    def ensureAlarmPlaylist(self):
+    def ensure_alarm_playlist(self):
         alarm_playlist = self.lookupAlarmPlaylist()
         if alarm_playlist is None:
             self._clientRequest("core.playlists.create", {
