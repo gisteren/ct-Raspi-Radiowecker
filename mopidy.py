@@ -175,7 +175,7 @@ class MusicPlayer(object):
             self._clientRequest("core.tracklist.clear")
             track_uris = self.load_playlist_tracks()
             response = self._clientRequest("core.tracklist.add", {'uris': track_uris})
-            print(len(response["result"] + " songs added"))
+            print(len(response["result"]) + " songs added")
         except Exception as e:
             print(e)
 
