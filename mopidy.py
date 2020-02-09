@@ -1,12 +1,13 @@
-import requests
 import json
 import shutil
 import tempfile
-import urllib.request
 import threading
 import time
-import pygame
 import traceback
+import urllib.request
+
+import pygame
+import requests
 
 
 class MusicPlayer(object):
@@ -26,7 +27,7 @@ class MusicPlayer(object):
     old_trackinfo = None
 
     def __init__(self, hostname="127.0.0.1", port="6680", password=""):
-        self.url = "http://"+hostname+":"+port+"/mopidy/rpc"
+        self.url = "http://" + hostname + ":" + port + "/mopidy/rpc"
         # print(self.checkAlarmPlaylist())
         self.update_thread = threading.Thread(target=self.updateStatus)
         self.update_thread.daemon = True
@@ -141,12 +142,12 @@ class MusicPlayer(object):
 
     def volup(self):
         self._clientRequest("core.mixer.set_volume", {
-                            "volume": self.volume + 10})
+            "volume": self.volume + 10})
         self.getVolume()
 
     def voldown(self):
         self._clientRequest("core.mixer.set_volume", {
-                            "volume": self.volume - 10})
+            "volume": self.volume - 10})
         self.getVolume()
 
     def get_state(self):
@@ -161,11 +162,11 @@ class MusicPlayer(object):
 
     def is_current_tracklist_empty(self):
         return len(self.get_current_tracklist()) == 0
-    
+
     def ensure_tracklist(self):
         if self.is_current_tracklist_empty():
             self.set_alarm_playlist()
-    
+
     def set_alarm_playlist(self):
         try:
             self.ensure_alarm_playlist()
@@ -174,8 +175,8 @@ class MusicPlayer(object):
             alarm_tracks = self._clientRequest(
                 "core.playlists.get_items", {"uri": alarm_uri})["result"]
             track_uris = [track["uri"] for track in alarm_tracks]
-            self._clientRequest(
-                "core.tracklist.add", {'uris': track_uris})
+            track_add_response = self._clientRequest("core.tracklist.add", {'uris': track_uris})
+            result = track_add_response["result"]
         except Exception as e:
             print(e)
 
