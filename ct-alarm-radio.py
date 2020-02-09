@@ -160,7 +160,7 @@ class application:
 
         if not self.player_primed:
             self.player_primed = True
-            self.musicplayer.set_alarm_playlist()
+            self.musicplayer.set_playlist_tracks()
             self.musicplayer.play()
 
         new_time = int(time.time())

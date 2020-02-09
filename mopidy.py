@@ -25,10 +25,12 @@ class MusicPlayer(object):
     trackdata_changed = True
     old_trackimages = None
     old_trackinfo = None
+    
+    playlist_name = None
 
-    def __init__(self, hostname="127.0.0.1", port="6680", password=""):
+    def __init__(self, hostname="127.0.0.1", port="6680", password="", playlist_name="Alarm"):
+        self.playlist_name = playlist_name
         self.url = "http://" + hostname + ":" + port + "/mopidy/rpc"
-        # print(self.checkAlarmPlaylist())
         self.update_thread = threading.Thread(target=self.updateStatus)
         self.update_thread.daemon = True
         self.update_thread.start()
@@ -165,31 +167,34 @@ class MusicPlayer(object):
 
     def ensure_tracklist(self):
         if self.is_current_tracklist_empty():
-            self.set_alarm_playlist()
+            self.set_playlist_tracks()
 
-    def set_alarm_playlist(self):
+    def set_playlist_tracks(self):
         try:
-            self.ensure_alarm_playlist()
+            self.ensure_playlist()
             self._clientRequest("core.tracklist.clear")
-            alarm_uri = self.lookupAlarmPlaylist()
-            alarm_tracks = self._clientRequest(
-                "core.playlists.get_items", {"uri": alarm_uri})["result"]
-            track_uris = [track["uri"] for track in alarm_tracks]
-            track_add_response = self._clientRequest("core.tracklist.add", {'uris': track_uris})
-            result = track_add_response["result"]
+            track_uris = self.load_playlist_tracks()
+            self._clientRequest("core.tracklist.add", {'uris': track_uris})
         except Exception as e:
             print(e)
 
-    def ensure_alarm_playlist(self):
-        alarm_playlist = self.lookupAlarmPlaylist()
-        if alarm_playlist is None:
+    def load_playlist_tracks(self):
+        playlist_uri = self.lookup_playlist()
+        tracks = self._clientRequest(
+            "core.playlists.get_items", {"uri": playlist_uri})["result"]
+        track_uris = [track["uri"] for track in tracks]
+        return track_uris
+
+    def ensure_playlist(self):
+        playlist = self.lookup_playlist()
+        if playlist is None:
             self._clientRequest("core.playlists.create", {
-                "name": "Alarm"
+                "name": self.playlist_name
             })
 
-    def lookupAlarmPlaylist(self):
+    def lookup_playlist(self):
         response = self._clientRequest("core.playlists.as_list")
-        filtered_result = [playlist for playlist in response["result"] if playlist["name"] == "Alarm"]
+        filtered_result = [playlist for playlist in response["result"] if playlist["name"] == self.playlist_name]
         if len(filtered_result) > 0:
             return filtered_result[0]["uri"]
         else:
