@@ -11,11 +11,13 @@ class Alarm(object):
     snooze = False
     snooze_timer = 0
 
+
     def __init__(self, alarmtime, snooze_for_n_seconds, musicplayer):
         self.alarmtime = datetime.strptime(alarmtime, "%H:%M")
         self.time = self.alarmtime
         self.snooze_n_seconds = int(snooze_for_n_seconds)
         self.musicplayer = musicplayer
+        self.enabled = enable_alarm == "1"
         self.check_alarm_thread = threading.Thread(target=self.checkAlarm)
         self.check_alarm_thread.daemon = True
         self.check_alarm_thread.start()
@@ -28,7 +30,8 @@ class Alarm(object):
             new_time = int(datetime.now().minute)
             if new_time != self.old_time:
                 self.old_time = new_time
-                if self.enabled is True and self.alarmtime.hour == datetime.now().hour and self.alarmtime.minute == datetime.now().minute:
+
+                if self.enabled and self.alarmtime.hour == datetime.now().hour and self.alarmtime.minute == datetime.now().minute:
                     self.alarm_active = True
             time.sleep(1)
 

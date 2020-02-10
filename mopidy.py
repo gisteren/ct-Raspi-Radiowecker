@@ -1,12 +1,13 @@
-import requests
 import json
 import shutil
 import tempfile
-import urllib.request
 import threading
 import time
-import pygame
 import traceback
+import urllib.request
+
+import pygame
+import requests
 
 
 class MusicPlayer(object):
@@ -24,15 +25,18 @@ class MusicPlayer(object):
     trackdata_changed = True
     old_trackimages = None
     old_trackinfo = None
+
     playlist_set = False
 
-    def __init__(self, hostname="127.0.0.1", port="6680", password="", shuffle=False):
-        self.url = "http://"+hostname+":"+port+"/mopidy/rpc"
+    def __init__(self, hostname="127.0.0.1", port="6680", password="", shuffle=False, playlist_name="Alarm"):
+        self.playlist_name = playlist_name
+        self.url = "http://" + hostname + ":" + port + "/mopidy/rpc"
         if shuffle == "1":
             self.shuffle = True
         else:
             self.shuffle = False
         # print(self.checkAlarmPlaylist())
+
         self.update_thread = threading.Thread(target=self.updateStatus)
         self.update_thread.daemon = True
         self.update_thread.start()
@@ -48,7 +52,7 @@ class MusicPlayer(object):
     def updateStatus(self):
         while True:
             self.updateTrackInfo()
-            self.getState()
+            self.get_state()
             self.getVolume()
             time.sleep(1)
 
@@ -80,14 +84,21 @@ class MusicPlayer(object):
         try:
             trackinfo = self._clientRequest(
                 "core.playback.get_current_track")["result"]
-            trackimages = self._clientRequest("core.library.get_images", {
-                "uris": [trackinfo["uri"]]})["result"]
-            if self.old_trackinfo == trackinfo and self.old_trackimages == trackimages:
+            if self.old_trackinfo == trackinfo:
                 self.trackdata_changed = False
                 return
             else:
+                self.trackdata_changed = True
+
+            if trackinfo is None:
+                self.imageurl = self.old_trackinfo = self.old_trackimages = None
+                self.artist = self.album = self.title = ""
+            else:
+                trackimages = self._clientRequest("core.library.get_images", {
+                    "uris": [trackinfo["uri"]]})["result"]
                 self.old_trackinfo = trackinfo
                 self.old_trackimages = trackimages
+
                 self.trackdata_changed = True
             self.artist = trackinfo["artists"][0]["name"].strip()
             self.title = trackinfo["name"].strip()
@@ -99,6 +110,7 @@ class MusicPlayer(object):
                 self.imageurl = trackimages[trackinfo["uri"]][0]["uri"]
             except:
                 self.imageurl = None
+
         except Exception as e:
             print(traceback.format_exc())
             self.artist = self.album = self.title = ""
@@ -107,15 +119,17 @@ class MusicPlayer(object):
         if self.artist == self.album:
             self.album = ""
 
+
     def togglePlay(self):
         if not self.playlist_set:
             self.setAlarmPlaylist()
+
         if self.playing:
             method = "core.playback.pause"
         else:
             method = "core.playback.play"
         self._clientRequest(method)
-        self.getState()
+        self.get_state()
 
     def play(self):
         if not self.playlist_set:
@@ -125,7 +139,7 @@ class MusicPlayer(object):
             self._clientRequest(method)
         method = "core.playback.play"
         self._clientRequest(method)
-        self.getState()
+        self.get_state()
 
     def skip(self):
         self._clientRequest("core.playback.next")
@@ -136,40 +150,51 @@ class MusicPlayer(object):
     def getVolume(self):
         try:
             self.volume = int(self._clientRequest(
-                "core.playback.get_volume")["result"])
+                "core.mixer.get_volume")["result"])
             self.muted = bool(self._clientRequest(
-                "core.playback.get_mute")["result"])
+                "core.mixer.get_mute")["result"])
         except Exception as e:
             print(e)
             self.volume = 100
             self.muted = False
 
-    def toggleMute(self):
-        self._clientRequest("core.playback.set_mute", {"mute": not self.muted})
+    def toggle_mute(self):
+        self._clientRequest("core.mixer.set_mute", {"mute": not self.muted})
         self.muted = bool(self._clientRequest(
-            "core.playback.get_mute")["result"])
+            "core.mixer.get_mute")["result"])
 
     def volup(self):
-        self._clientRequest("core.playback.set_volume", {
-                            "volume": self.volume + 10})
+        self._clientRequest("core.mixer.set_volume", {
+            "volume": self.volume + 10})
         self.getVolume()
 
     def voldown(self):
-        self._clientRequest("core.playback.set_volume", {
-                            "volume": self.volume - 10})
+        self._clientRequest("core.mixer.set_volume", {
+            "volume": self.volume - 10})
         self.getVolume()
 
-    def getState(self):
+    def get_state(self):
         status = self._clientRequest("core.playback.get_state")["result"]
         if status == "playing":
             self.playing = True
         else:
             self.playing = False
 
-    def setAlarmPlaylist(self):
+    def get_current_tracklist(self):
+        return self._clientRequest("core.tracklist.get_tracks")["result"]
+
+    def is_current_tracklist_empty(self):
+        return len(self.get_current_tracklist()) == 0
+
+    def ensure_tracklist(self):
+        if self.is_current_tracklist_empty():
+            self.set_playlist_tracks()
+
+    def set_playlist_tracks(self):
         try:
-            self.checkAlarmPlaylist()
+            self.ensure_playlist()
             self._clientRequest("core.tracklist.clear")
+
             alarm_uri = self._clientRequest("core.playlists.filter", {
                 "criteria": {"name": "Alarm"}})["result"][0]["uri"]
             alarm_tracks = self._clientRequest(
@@ -178,18 +203,31 @@ class MusicPlayer(object):
                 self._clientRequest(
                     "core.tracklist.add", {'uri': track["uri"]})
             self.playlist_set = True
+
         except Exception as e:
             print(e)
 
-    def checkAlarmPlaylist(self):
-        result = self._clientRequest("core.playlists.filter", {
-            "criteria": {"name": "Alarm"}})
-        if len(result["result"]) > 0:
-            self.playlist = result["result"][0]["uri"]
+    def load_playlist_tracks(self):
+        playlist_uri = self.lookup_playlist()
+        tracks = self._clientRequest(
+            "core.playlists.get_items", {"uri": playlist_uri})["result"]
+        track_uris = [track["uri"] for track in tracks]
+        return track_uris
+
+    def ensure_playlist(self):
+        playlist = self.lookup_playlist()
+        if playlist is None:
+            self._clientRequest("core.playlists.create", {
+                "name": self.playlist_name
+            })
+
+    def lookup_playlist(self):
+        response = self._clientRequest("core.playlists.as_list")
+        filtered_result = [playlist for playlist in response["result"] if playlist["name"] == self.playlist_name]
+        if len(filtered_result) > 0:
+            return filtered_result[0]["uri"]
         else:
-            self.playlist = self._clientRequest("core.playlists.create", {
-                "name": "Alarm"
-            })["result"][0]["uri"]
+            return None
 
     def _clientRequest(self, method, params={}):
         headers = {'content-type': 'application/json'}
