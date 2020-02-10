@@ -15,7 +15,7 @@ from time import time, sleep
 
 class Gui:
     def __init__(self, display_resolution, fg_color, bg_color,
-                 cursor_visible, quit_function):
+                 cursor_visible):
         pygame.init()
         pygame.mixer.quit()
         # a fullscreen switch for debugging purposes
